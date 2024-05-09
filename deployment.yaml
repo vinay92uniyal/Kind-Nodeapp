@@ -11,6 +11,8 @@ spec:
       app: nodeapp
   template:
     metadata:
+      annotations:
+        iam.gke.io/gcp-service-account: "test-sa@goldengate-1.iam.gserviceaccount.com" # Replace PROJECT_ID with your GCP project ID
       labels:
         app: nodeapp
     spec:

@@ -1,35 +1,46 @@
-name: Migrate All Images to Artifact Registry
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - main  # Adjust branch name as needed
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  migrate:
+  deploy:
+
     runs-on: self-hosted
 
+    strategy:
+      matrix:
+        node-version: [14.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
-      # Step 1: Authenticate with GCR
-      - name: Configure Docker CLI for GCR
-        uses: google-github-actions/setup-gcloud@v0.2.0
-        with:
-          service_account_key: ${{ secrets.GCR_SA_KEY }}
-          export-access-token: true
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm install
 
-      # Step 2: Pull all images from GCR
-      - name: Pull all images from GCR
-        run: |
-          #!/bin/bash
+    # Install the gcloud SDK with Workload Identity support
+    - name: install the gcloud cli with Workload Identity
+      uses: google-github-actions/setup-gcloud@v0.2.0
+      with:
+        workload_identity: true
+        export_default_credentials: true
 
-          # Set the GCR project ID
-          PROJECT_ID="goldengate-1"
-
-          # Get a list of all images in the project
-          IMAGES=$(gcloud container images list --project="$PROJECT_ID" --format='value(name)')
-
-          # Iterate through each image
-          for IMAGE in $IMAGES; do
-              # Pull all tags of the image
-              docker pull "$IMAGE"
-          done
+  #  - name: build and push the docker image
+  #    run: |
+  #      gcloud auth configure-docker us-central1-docker.pkg.dev
+  #      docker build -t us-central1-docker.pkg.dev/goldengate-1/test-project/node:latest .
+  #      docker push us-central1-docker.pkg.dev/goldengate-1/test-project/node:latest
+    - name: deploy to gke
+      run: |
+        gcloud container clusters get-credentials innotest-cluster --region us-central1-c
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml

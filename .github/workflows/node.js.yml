@@ -30,17 +30,16 @@ jobs:
 
     # Set up Google Cloud SDK
     - name: Configure Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0.3.0
-      with:
-        project_id: ${{ secrets.GOOGLE_PROJECT }}
-        workload_identity: true
-        export_default_credentials: true
+      run: |
+        gcloud config set project ${{ secrets.GOOGLE_PROJECT }}
+        gcloud auth configure-docker
+        gcloud container clusters get-credentials test-cluster --region asia-south1-a
 
-    - name: Install gke-gcloud-auth-plugin
-      run: gcloud components install gke-gcloud-auth-plugin
+    - name: Set up Workload Identity
+      run: |
+        kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud auth list --filter=status:ACTIVE --format="value(account)" | head -n 1)
 
     - name: deploy to gke
       run: |
-        gcloud container clusters get-credentials test-cluster --region asia-south1-a
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml

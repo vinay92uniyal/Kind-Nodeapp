@@ -21,11 +21,11 @@ jobs:
       
       - name: Create namespace
         run: |
-          kubectl create namespace test-namspace
+          kubectl create namespace testing-namspace
       
       - name: Create ServiceAccount
         run: |
-          kubectl create serviceaccount test-ksa --namespace test-namspace
+          kubectl create serviceaccount test-ksa --namespace testing-namspace
       
       - name: Bind IAM policy
         run: |

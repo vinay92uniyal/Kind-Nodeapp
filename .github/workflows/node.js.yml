@@ -16,6 +16,9 @@ jobs:
       - name: Authenticate with Google Cloud
         uses: google-github-actions/setup-gcloud@v0.2.0
       
+      - name: Get cluster credentials
+        run: gcloud container clusters get-credentials testgke-cluster --region asia-south1-a
+      
       - name: Create namespace
         run: |
           kubectl create namespace test-ns
@@ -30,3 +33,4 @@ jobs:
             --role=roles/container.clusterViewer \
             --member=principal://iam.googleapis.com/projects/105619775743/locations/global/workloadIdentityPools/goldengate-1.svc.id.goog/subject/ns/test-ns/sa/test-sa \
             --condition=None
+

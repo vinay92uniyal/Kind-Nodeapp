@@ -1,45 +1,29 @@
-name: Node.js CI/CD with Workload Identity
+name: Setup Workload Identity Federation
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
-  deploy:
-
+  setup:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm install
-
-    # Set up Google Cloud SDK
-    - name: Configure Google Cloud SDK
-      run: |
-        gcloud config set project ${{ secrets.GOOGLE_PROJECT }}
-        gcloud auth configure-docker
-        gcloud container clusters get-credentials test-cluster --region asia-south1-a
-
-    - name: Set up Workload Identity
-      run: |
-        kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud auth list --filter=status:ACTIVE --format="value(account)" | head -n 1)
-
-    - name: deploy to gke
-      run: |
-        kubectl apply -f deployment.yaml
-        kubectl apply -f service.yaml
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v0.7
+      
+      - name: Create namespace
+        run: |
+          kubectl create namespace test-ns
+      
+      - name: Create ServiceAccount
+        run: |
+          kubectl create serviceaccount KSA_NAME --namespace test-sa
+      
+      - name: Bind IAM policy
+        run: |
+          gcloud projects add-iam-policy-binding goldengate-1 \
+            --role=roles/container.clusterViewer \
+            --member=principal://iam.googleapis.com/projects/105619775743/locations/global/workloadIdentityPools/goldengate-1.svc.id.goog/subject/ns/test-ns/sa/test-sa \
+            --condition=None

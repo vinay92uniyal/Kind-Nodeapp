@@ -25,12 +25,12 @@ jobs:
       
       - name: Create ServiceAccount
         run: |
-          kubectl create serviceaccount KSA_NAME --namespace testksa-sa
+          kubectl create serviceaccount KSA_NAME --namespace testing-sa
       
       - name: Bind IAM policy
         run: |
           gcloud projects add-iam-policy-binding goldengate-1 \
             --role=roles/container.clusterViewer \
-            --member=principal://iam.googleapis.com/projects/105619775743/locations/global/workloadIdentityPools/goldengate-1.svc.id.goog/subject/ns/testgke-ns/sa/testksa-sa \
+            --member=principal://iam.googleapis.com/projects/105619775743/locations/global/workloadIdentityPools/goldengate-1.svc.id.goog/subject/ns/testgke-ns/sa/testing-sa \
             --condition=None
 

@@ -25,12 +25,12 @@ jobs:
       
       - name: Create ServiceAccount
         run: |
-          kubectl create serviceaccount test-ksa --namespace testnamspace
+          kubectl create serviceaccount test-ksa --namespace test-namspace
       
       - name: Bind IAM policy
         run: |
           gcloud projects add-iam-policy-binding goldengate-1 \
             --role=roles/container.clusterViewer \
-            --member=workload-identity-testing account\
+            --member=GHA-workload-identity-testing account\
             --condition=None
 

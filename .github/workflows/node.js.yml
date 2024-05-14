@@ -31,6 +31,6 @@ jobs:
         run: |
           gcloud projects add-iam-policy-binding goldengate-1 \
             --role=roles/container.clusterViewer \
-            --member=GHA-workload-identity-testing account\
+            --member=GHA-workload-identity-testing \
             --condition=None
 

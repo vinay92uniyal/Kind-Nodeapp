@@ -5,22 +5,21 @@ metadata:
   labels:
     app: nodeapp
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: nodeapp
   template:
     metadata:
-      annotations:
-        iam.gke.io/gcp-service-account: "test-sa@goldengate-1.iam.gserviceaccount.com" # Replace PROJECT_ID with your GCP project ID
       labels:
         app: nodeapp
     spec:
       containers:
       - name: nodeserver
-        image: us-central1-docker.pkg.dev/goldengate-1/test-project/node:latest
+        image: us-central1-docker.pkg.dev/goldengate-1/demogcr-ar/node:latest
         ports:
         - containerPort: 3000
-        imagePullPolicy: Always  # Always pull the latest image
+        imagePullPolicy: Always
   strategy:
     type: RollingUpdate
+

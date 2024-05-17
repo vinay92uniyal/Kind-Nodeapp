@@ -21,17 +21,17 @@ jobs:
       
       - name: Create namespace
         run: |
-          kubectl create namespace ns-test
+          kubectl create namespace nsgke-test
       
       - name: Create ServiceAccount
         run: |
-          kubectl create serviceaccount ksa-test --namespace ns-test
+          kubectl create serviceaccount ksagke-test --namespace nsgke-test
       
       - name: Bind IAM policy
         run: |
           gcloud projects add-iam-policy-binding goldengate-1 \
             --role=roles/container.clusterViewer \
-            --member=principal://iam.googleapis.com/projects/105619775743/locations/global/workloadIdentityPools/goldengate-1.svc.id.goog/subject/ns/ns-test/sa/ksa-test \
+            --member=principal://iam.googleapis.com/projects/105619775743/locations/global/workloadIdentityPools/goldengate-1.svc.id.goog/subject/ns/nsgke-test/sa/ksagke-test \
             --condition=None
 
       - name: Build and push the docker image
@@ -43,6 +43,5 @@ jobs:
       - name: Deploy to GKE
         run: |
           gcloud container clusters get-credentials testgke-cluster --region asia-south1-a
-          kubectl rollout restart deployment nodeapp-deployment
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml

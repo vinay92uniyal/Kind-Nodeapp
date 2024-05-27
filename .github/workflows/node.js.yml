@@ -21,12 +21,12 @@ jobs:
       
       - name: Create namespace
         run: |
-          kubectl get namespace test-ns
-      
+            kubectl get namespace nstest || kubectl create namespace nstest
+
       - name: Create ServiceAccount
         run: |
-          kubectl get serviceaccount ksatest --namespace test-ns
-      
+             kubectl get serviceaccount ksatest --namespace nstest || kubectl create serviceaccount ksatest --namespace nstest
+
       - name: Bind IAM policy
         run: |
           gcloud projects add-iam-policy-binding goldengate-1 \

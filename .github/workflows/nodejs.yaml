@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Setup Workload Identity Federation
 
 on:
   push:
@@ -7,48 +7,40 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
-
+  setup:
     runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm install
-    
-    - name: Set gcloud account
-      run: gcloud config set account testgcp-sa@goldengate-1.iam.gserviceaccount.com
-      # Replace <ACCOUNT_EMAIL> with the email address associated with the service account.
-
-    - name: Install the gcloud cli
-      uses: google-github-actions/setup-gcloud@v0.2.0
-      with:
-        project_id: ${{ secrets.GOOGLE_PROJECT }}
-        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        export_default_credentials: true
-
-    - name: build and push the docker image
-      env:
-        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-      run: |
-        gcloud auth configure-docker us-central1-docker.pkg.dev
-        docker build -t us-central1-docker.pkg.dev/goldengate-1/demogcr-ar/node:latest .
-        docker push us-central1-docker.pkg.dev/goldengate-1/demogcr-ar/node:latest
-    - name: deploy to gke
-      env:
-        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-      run: |
-        gcloud container clusters get-credentials testgke-cluster --region asia-south1-a
-        kubectl rollout restart deployment nodeapp-deployment 
-        kubectl apply -f deployment.yaml
-        kubectl apply -f service.yaml
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/setup-gcloud@v0.2.0
+      
+      - name: Get cluster credentials
+        run: gcloud container clusters get-credentials testgke-cluster --region asia-south1-a
+      
+      - name: Create namespace
+        run: |
+          kubectl create namespace test-ns-gke
+      
+      - name: Create ServiceAccount
+        run: |
+          kubectl create serviceaccount test-ns-gke --namespace test-ns-gke
+      
+      - name: Bind IAM policy
+        run: |
+          gcloud projects add-iam-policy-binding goldengate-1 \
+            --role=roles/container.clusterViewer \
+            --member=principal://iam.googleapis.com/projects/105619775743/locations/global/workloadIdentityPools/goldengate-1.svc.id.goog/subject/ns/test-ns-gke/sa/test-ksa-gke \
+            --condition=None
+      - name: Build and push the docker image
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+          docker build -t us-central1-docker.pkg.dev/goldengate-1/demogcr-ar/node:latest .
+          docker push us-central1-docker.pkg.dev/goldengate-1/demogcr-ar/node:latest
+      - name: Deploy to GKE
+        run: |
+          gcloud container clusters get-credentials testgke-cluster --region asia-south1-a
+          kubectl rollout restart deployment nodeapp-deployment
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml

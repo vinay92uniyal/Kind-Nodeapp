@@ -30,7 +30,7 @@ jobs:
     - run: npm install
     
     - name: Set gcloud account
-      run: gcloud config set account testgcp-sa@goldengate-1.iam.gserviceaccount.com
+      run: gcloud config set account test-sa@goldengate-1.iam.gserviceaccount.com
       # Replace <ACCOUNT_EMAIL> with the email address associated with the service account.
 
     - name: Install the gcloud cli

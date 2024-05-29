@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Setup Workload Identity Federation
 
 on:
   push:
@@ -7,56 +7,37 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  setup:
     runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [20.x]
-
     steps:
-    - uses: actions/checkout@v4 # Update to a version that uses Node.js 20
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4 # Update to a version that uses Node.js 20
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
-    - run: npm ci
-
-    - run: npm run build --if-present
-
-    - run: npm install
-
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2 # Update to a version that uses Node.js 20
-      with:
-        credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
-    - name: Set gcloud account
-      run: gcloud config set account test-sa@goldengate-1.iam.gserviceaccount.com
-      # Replace <ACCOUNT_EMAIL> with the email address associated with the service account.
-
-    - name: Install the gcloud cli
-      uses: google-github-actions/setup-gcloud@v2 # Update to a version that uses Node.js 20
-      with:
-        project_id: ${{ secrets.GOOGLE_PROJECT }}
-        version: latest
-
-    - name: Build and push the Docker image
-      env:
-        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-      run: |
-        gcloud auth configure-docker us-central1-docker.pkg.dev
-        docker build -t us-central1-docker.pkg.dev/goldengate-1/demogcr-ar/node:latest .
-        docker push us-central1-docker.pkg.dev/goldengate-1/demogcr-ar/node:latest
-
-    - name: Deploy to GKE
-      env:
-        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-      run: |
-        gcloud container clusters get-credentials testgke-cluster --region asia-south1-a
-        kubectl rollout restart deployment nodeapp-deployment 
-        kubectl apply -f deployment.yaml
-        kubectl apply -f service.yaml
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: Get cluster credentials
+        run: gcloud container clusters get-credentials testgke-cluster --region asia-south1-a
+      
+      - name: Create namespace
+        run: |
+            kubectl get namespace test-ns || kubectl create namespace test-ns
+      
+      - name: Create ServiceAccount
+        run: |
+            kubectl get serviceaccount test-ksa --namespace test-ns || kubectl create serviceaccount test-ksa --namespace test-ns
+      
+      - name: Bind IAM policy
+        run: |
+          gcloud projects add-iam-policy-binding goldengate-1 \
+            --role=roles/storage.objectAdmin \
+            --member=serviceAccount:goldengate-1.svc.id.goog[test-ns/test-ksa] \
+            --condition=None
+      
+      - name: Create GCS Bucket
+        run: |
+          gsutil mb gs://test-innobucket1534
+      
+      - name: Store application in GCS Bucket
+        run: |
+          gsutil cp /home/mnagaraju/actions-runner/Testproject-INNO gs://test-innobucket1534

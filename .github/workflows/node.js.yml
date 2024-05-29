@@ -40,4 +40,4 @@ jobs:
       
       - name: Store application in GCS Bucket
         run: |
-          gsutil cp /home/mnagaraju/actions-runner/Testproject-INNO gs://test-innobucket1534
+          gsutil cp -r https://console.cloud.google.com/storage/browser/test-innobucket1534 gs://test-innobucket1534

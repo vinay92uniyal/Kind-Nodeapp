@@ -34,9 +34,9 @@ jobs:
             --member=serviceAccount:goldengate-1.svc.id.goog[test-ns/test-ksa] \
             --condition=None
       
-      - name: Create GCS Bucket
+      - name: GCS Bucket
         run: |
-          gsutil mb gs://test-innobucket1534
+          gsutil ls gs://test-innobucket1534
       
       - name: Store application in GCS Bucket
         run: |

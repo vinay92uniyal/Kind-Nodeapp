@@ -3,7 +3,7 @@ name: Prebuilt repo + Snyk Security Scanning (OS, Code, Docker, IaC)
 # Runs 4 Snyk Products (Code, Open Source, Container, IaC)
 # Snyk installation via npm
 # Node.js version: 18.4
-# Outputs the results to the pipeline and in SARIF-format to the security tab
+# Outputs the results to thef pipeline and in SARIF-format to the security tab
 
 # Prerequisites:
 # - Set a SNYK_TOKEN and a SNYK_ORG in the pipelines secrets

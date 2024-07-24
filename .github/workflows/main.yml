@@ -45,8 +45,6 @@ jobs:
     - name: SNyk SCA Test
       run: 
           snyk test --json | snyk-to-html -o scaresult.html
-          mkdir downloads
-          cp -v /home/runner/work/sladey01.github.io/sladey01.github.io/*.html /home/runner/work/sladey01.github.io/sladey01.github.io/downloads
 
     
           
@@ -59,7 +57,7 @@ jobs:
       run: docker build . --file Dockerfile --tag sladey01/sladey01.github.io:latest
 
     - name: Snyk Container Scanning
-      run: snyk container test --file=Dockerfile -json -d| snyk-to-html -o snykcont.html 
+      run: snyk container test sladey01.github.io:latest -json | snyk-to-html -o snykcont.html 
       continue-on-error: true
     
 

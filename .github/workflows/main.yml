@@ -1,33 +1,74 @@
-name: Publish Docker image
+name: Prebuilt repo + Snyk Security Scanning (OS, Code, Docker, IaC)
 
-on:
-  push:
-    branches: ['master']
+# Runs 4 Snyk Products (Code, Open Source, Cont5ainer, IaC)
+# Snyk installation via npm
+# Node.js version: 18.4
+# Outputs the results to thef pipeline and in SARIF-format to the security tab
+
+# Prerequisites:
+# - Set a SNYK_TOKEN and a SNYK_ORG in the pipelines secrets
+
+on: [push, pull_request]
 
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js for installing Snyk 
+      uses: actions/setup-node@v2
+      with:
+        node-version: 18.4
+
+    # Install & prepare Snyk
+    - run: npm install --location=global snyk
+    
+    #  This OPTIONAL step will configure the Snyk CLI to connect to the EU instance of Snyk
+    #- run: snyk config set use-base64-encoding=true
+    #- run: snyk config set endpoint='https://app.eu.snyk.io/api'
       
-      - name: Log in to Docker Hub
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    - run: snyk auth ${{ secrets.SNYK_TOKEN }}
+    - name: install snyk-to-html
+      run: | 
+               npm install snyk-to-html -g 
+   # - name: Snyk Open Source Scanning
+     ## continue-on-error: true
+    - name: Install SNyk Filter
+      run: npm i -g snyk-filter
+
+    - name: Snyk filter test
+      run: snyk test --json | snyk-filter
+      continue-on-error: true
       
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: thetips4you/testjodejsapp
-      
-      - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+    - name: SNyk SCA Test
+      run: 
+          snyk test --json | snyk-to-html -o scaresult.html
+
+    
+          
+    - name: Snyk Code Scanning
+      run: snyk code test --json | snyk-to-html -o snykcode.html 
+      continue-on-error: true
+    
+
+    - name: Build the Docker Image
+      run: docker build . --file Dockerfile --tag sladey01/sladey01.github.io:latest
+
+    - name: Snyk Container Scanning
+      run: snyk container test sladey01.github.io:latest -json | snyk-to-html -o snykcont.html 
+      continue-on-error: true
+    
+
+    - name: Snyk Infrastructure-as-Code Scanning
+      run: snyk iac test --json | snyk-to-html -o snykiac.html
+      continue-on-error: true
+
+    
+
+    - name: Use the Upload Artifact GitHub Action
+      uses: actions/upload-artifact@v4
+      with:
+          name: results
+          path: ./*.html   

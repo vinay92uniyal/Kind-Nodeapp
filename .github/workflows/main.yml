@@ -1,6 +1,6 @@
 name: Prebuilt repo + Snyk Security Scanning (OS, Code, Docker, IaC)
 
-# Runs 4 Snyk Products (Code, Open Source, Container, IaC)
+# Runs 4 Snyk Products (Code, Open Source, Cont5ainer, IaC)
 # Snyk installation via npm
 # Node.js version: 18.4
 # Outputs the results to thef pipeline and in SARIF-format to the security tab

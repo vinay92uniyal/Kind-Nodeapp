@@ -1,43 +1,26 @@
-name: Setup Workload Identity Federation
+name: Docker Build and Run
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  setup:
+  build_and_run:
     runs-on: self-hosted
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/setup-gcloud@v2
-      
-      - name: Get cluster credentials
-        run: gcloud container clusters get-credentials testgke-cluster --region asia-south1-a
-      
-      - name: Create namespace
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
         run: |
-            kubectl get namespace test-ns || kubectl create namespace test-ns
-      
-      - name: Create ServiceAccount
+          docker build -t my_user_credentials . /home/mnagaraju/actions-runner/Testproject-inno
+
+      - name: Run Docker container
         run: |
-            kubectl get serviceaccount test-ksa --namespace test-ns || kubectl create serviceaccount test-ksa --namespace test-ns
-      
-      - name: Bind IAM policy for GCS bucket creation
+          docker run -d --name my_user_credentials_container my_user_credentials 
+
+      - name: Check decrypted credentials inside container
         run: |
-          gcloud projects add-iam-policy-binding goldengate-1 \
-            --role=roles/storage.objectAdmin \
-            --member=serviceAccount:goldengate-1.svc.id.goog[test-ns/test-ksa] \
-            --condition=None
-      
-      - name: GCS Bucket
-        run: |
-          gsutil ls gs://test-innobucket1534
-      
-      - name: Store application in GCS Bucket
-        run: |
-          gsutil cp -r /home/mnagaraju/actions-runner/Testproject-INNO gs://test-innobucket1534
+          docker exec my_user_credentials_container cat /home/mnagaraju/actions-runner/Testproject-inno/credentials.json

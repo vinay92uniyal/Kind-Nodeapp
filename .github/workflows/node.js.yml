@@ -15,7 +15,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t my_user_credentials . /home/mnagaraju/actions-runner/Testproject-inno
+          docker build -t my_user_credentials  /home/mnagaraju/actions-runner/Testproject-inno/
 
       - name: Run Docker container
         run: |

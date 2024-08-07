@@ -15,12 +15,14 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t my_user_credentials  /home/mnagaraju/actions-runner/Testproject-inno/
+          docker build -t my_decrypt_credentials  /home/mnagaraju/actions-runner/Testproject-inno/
 
-      - name: Run Docker container
+      - name: Recreate Docker Container
         run: |
-          docker run -d --name my_user_credentials_container my_user_credentials 
-
+          docker stop my_decrypt_credentials || true
+          docker rm my_decrypt_credentials || true
+          docker run --name my_decrypt_credentials -d my_decrypt_credentials
+          
       - name: Check decrypted credentials inside container
         run: |
-          docker exec my_user_credentials_container cat /home/mnagaraju/actions-runner/Testproject-inno/credentials.txt
+          docker exec -it my_decrypt_credentials  cat /home/mnagaraju/actions-runner/Testproject-inno/credentials.txt

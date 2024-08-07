@@ -23,4 +23,4 @@ jobs:
 
       - name: Check decrypted credentials inside container
         run: |
-          docker exec my_user_credentials_container cat /home/mnagaraju/actions-runner/Testproject-inno/credentials.json
+          docker exec my_user_credentials_container cat /home/mnagaraju/actions-runner/Testproject-inno/credentials.txt

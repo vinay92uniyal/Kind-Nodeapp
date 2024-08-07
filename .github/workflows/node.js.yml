@@ -23,6 +23,6 @@ jobs:
           docker rm my_decrypt_credentials || true
           docker run --name my_decrypt_credentials -d my_decrypt_credentials
           
-      - name: Check decrypted credentials inside container
+      - name: Display Decrypt credentials
         run: |
-          docker exec -it my_decrypt_credentials  cat /home/mnagaraju/actions-runner/Testproject-inno/credentials.txt
+           docker exec my_decrypt_credentials cat /home/mnagaraju/actions-runner/Testproject-inno/credentials.txt

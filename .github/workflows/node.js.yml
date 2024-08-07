@@ -22,7 +22,3 @@ jobs:
           docker stop my_decrypt_credentials || true
           docker rm my_decrypt_credentials || true
           docker run --name my_decrypt_credentials -d my_decrypt_credentials
-          
-      - name: Display Decrypt credentials
-        run: |
-           docker exec my_decrypt_credentials cat /home/mnagaraju/actions-runner/Testproject-inno/credentials.txt

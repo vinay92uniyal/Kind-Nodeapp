@@ -9,10 +9,6 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
-      - name: Set execute permissions for decryption script
-        run: |
-         chmod +x /home/mnagaraju/actions-runner/Testproject-inno/decrypt.sh
-
       - name: Run decryption script
         run: |
           /home/mnagaraju/actions-runner/Testproject-inno/decrypt.sh

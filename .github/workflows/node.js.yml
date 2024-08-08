@@ -15,10 +15,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t my_decrypt_credentials  /home/mnagaraju/actions-runner/Testproject-inno/
+          docker build -t test_decrypt_credentials  /home/mnagaraju/actions-runner/Testproject-inno/
 
       - name: Recreate Docker Container
         run: |
-          docker stop my_decrypt_credentials || true
-          docker rm my_decrypt_credentials || true
-          docker run --name my_decrypt_credentials -d my_decrypt_credentials
+          docker stop test_decrypt_credentials || true
+          docker rm test_decrypt_credentials || true
+          docker run --name test_decrypt_credentials -d test_decrypt_credentials

@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Set execute permissions for decryption script
         run: |
-          chmod +x /home/mnagaraju/actions-runner/Testproject-inno/decrypt.sh
+         chmod +x /home/mnagaraju/actions-runner/Testproject-inno/decrypt.sh
 
       - name: Run decryption script
         run: |

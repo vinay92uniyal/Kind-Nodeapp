@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: dockerfile
     volumes:
-      - /app/config/credentials.txt
+      - '/home/mnagaraju/actions-runner/Testproject-inno/credentials.txt:/app/config/credentials.txt'
     environment:
       - NODE_ENV=test
     restart: always

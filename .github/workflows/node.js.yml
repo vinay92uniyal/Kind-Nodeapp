@@ -1,4 +1,4 @@
-name: Docker Build and Run
+name: Deploy
 
 on:
   push:
@@ -6,19 +6,30 @@ on:
       - main
 
 jobs:
-  build_and_run:
+  deploy:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Build Docker image
+      - name: Decrypt credentials
         run: |
-          docker build -t test_decrypt_credentials  /home/mnagaraju/actions-runner/Testproject-inno/
+          # Path variables
+          CREDENTIALS_ENC="/home/mnagaraju/actions-runner/Testproject-inno/credentials.enc"
+          ENCRYPTION_KEY="/home/mnagaraju/actions-runner/Testproject-inno/encryption_key.txt"
+          CREDENTIALS="/home/mnagaraju/actions-runner/Testproject-inno/credentials.txt"
 
-      - name: Recreate Docker Container
+          # Decrypt the credentials
+          openssl enc -aes-256-cbc -pbkdf2 -d -in $CREDENTIALS_ENC -out $CREDENTIALS -pass file:$ENCRYPTION_KEY
+
+          if [ $? -ne 0 ]; then
+            echo "Decryption failed"
+            exit 1
+          fi
+
+          echo "Decryption succeeded"
+
+      - name: Deploy with Docker Compose
         run: |
-          docker stop test_decrypt_credentials || true
-          docker rm test_decrypt_credentials || true
-          docker run --name test_decrypt_credentials -d test_decrypt_credentials
+          docker-compose -f /home/mnagaraju/actions-runner/Testproject-inno up -d

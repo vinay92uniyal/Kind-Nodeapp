@@ -16,4 +16,4 @@ jobs:
       - name: Deploy with Docker Compose
         run: |
           docker-compose -f /home/mnagaraju/actions-runner/Testproject-inno/docker-compose-test.yml build &&
-          docker-compose -f /home/mnagaraju/actions-runner/Testproject-inno/docker-compose-test.yml up -d
+        # docker-compose -f /home/mnagaraju/actions-runner/Testproject-inno/docker-compose-test.yml up -d

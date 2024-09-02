@@ -13,7 +13,6 @@ jobs:
      #   run: |
      #     /home/mnagaraju/actions-runner/Testproject-inno/decrypt.sh
 
-      - name: Deploy with Docker Compose
+      - name: build image
         run: |
-          docker-compose -f /home/mnagaraju/actions-runner/Testproject-inno/docker-compose-test.yml build &&
-        # docker-compose -f /home/mnagaraju/actions-runner/Testproject-inno/docker-compose-test.yml up -d
+             docker build -t my-app:latest .  /home/mnagaraju/actions-runner/Testproject-inno/dockerfile-optimize

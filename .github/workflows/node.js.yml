@@ -18,4 +18,4 @@ jobs:
 
      - name: Build Docker image for node
        run: |
-          docker build -t my-node:latest -f /home/mnagaraju/actions-runner/Testproject-inno/Dockerfile /home/mnagaraju/actions-runner/Testproject-inno/
+          docker build -t my-node:latest -f /home/mnagaraju/actions-runner/Testproject-inno/dockerfile-optimize /home/mnagaraju/actions-runner/Testproject-inno/

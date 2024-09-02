@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: dockerfile-optimize
     volumes:
       - '/home/mnagaraju/actions-runner/Testproject-inno/credentials.txt:/app/config/credentials.txt'
     environment:

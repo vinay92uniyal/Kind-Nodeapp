@@ -15,4 +15,4 @@ jobs:
 
       - name: build image
         run: |
-             docker build -t my-app:latest .  /home/mnagaraju/actions-runner/Testproject-inno/dockerfile-optimize
+            docker build -t my-app:latest /home/mnagaraju/actions-runner/Testproject-inno/dockerfile-optimize

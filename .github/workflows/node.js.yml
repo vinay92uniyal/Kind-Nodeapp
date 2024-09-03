@@ -9,9 +9,7 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
-     - name: Set up Docker Buildx
-       uses: docker/setup-buildx-action@v2
-      
+    
      - name: Build Docker image for app
        run: |
           docker build -t my-app:latest -f /home/mnagaraju/actions-runner/Testproject-inno/dockerfile /home/mnagaraju/actions-runner/Testproject-inno

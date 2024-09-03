@@ -18,6 +18,7 @@ RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
 
 # Copy package files and install dependencies
 COPY package.json package-lock.json ./
+
 RUN yarn install --frozen-lockfile
 
 # Copy the remaining application source code

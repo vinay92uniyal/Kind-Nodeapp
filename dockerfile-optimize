@@ -1,4 +1,4 @@
-FROM node:${NODE_VERSION:-14.19.2}-slim AS build
+FROM node:${NODE_VERSION:-14.19.2}-slim AS deps
 
 # Set up working directory and noninteractive mode for apt-get
 WORKDIR /usr/app

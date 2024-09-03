@@ -1,12 +1,10 @@
-FROM node:${NODE_VERSION:-14.19.2}-slim AS deps
+FROM node:${NODE_VERSION:-14.19.2}-slim AS build
 
-# Set up working directory
+# Set up working directory and noninteractive mode for apt-get
 WORKDIR /usr/app
-
-# Set noninteractive mode for apt-get
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update Debian sources and install necessary packages in a single layer
+# Update Debian sources, install necessary packages, and clean up in a single layer
 RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
     sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list && \
     sed -i '/stretch-updates/d' /etc/apt/sources.list && \
@@ -14,17 +12,13 @@ RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
     apt-get -y dist-upgrade && \
     apt-get install -y --no-install-recommends musl-dev openssh-client && \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1 && \
+    npm install -g pm2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /tmp/*
 
-# Copy only the package files first to leverage Docker cache
+# Copy package files and install dependencies
 COPY package.json package-lock.json ./
-
-# RUN yarn install --frozen-lockfile
-
-# Install pm2 globally
-RUN npm install -g pm2 && \
-    rm -rf /usr/share/doc /usr/share/man /tmp/*
+RUN yarn install --frozen-lockfile
 
 # Copy the remaining application source code
 COPY . .

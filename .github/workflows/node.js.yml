@@ -14,8 +14,8 @@ jobs:
       
      - name: Build Docker image for app
        run: |
-          docker build -t my-app:latest -f /home/mnagaraju/actions-runner/Testproject-inno/dockerfile /home/mnagaraju/actions-runner/Testproject-inno
+          docker build -t test-app:latest -f /home/mnagaraju/actions-runner/Testproject-inno/dockerfile /home/mnagaraju/actions-runner/Testproject-inno
 
      - name: Build Docker image for node
        run: |
-          docker build -t my-node:latest -f /home/mnagaraju/actions-runner/Testproject-inno/dockerfile-optimize /home/mnagaraju/actions-runner/Testproject-inno/
+          docker build -t optimize-app:latest -f /home/mnagaraju/actions-runner/Testproject-inno/dockerfile-optimize /home/mnagaraju/actions-runner/Testproject-inno/

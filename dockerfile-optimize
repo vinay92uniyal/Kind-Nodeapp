@@ -1,20 +1,31 @@
-# Use a smaller base image
-FROM node:16-alpine
+FROM node:${NODE_VERSION:-14.19.2} AS deps
 
-# Set the working directory
-WORKDIR /app
+# Set up working directory
+WORKDIR /usr/app
 
-# Copy package.json and package-lock.json (if available)
-COPY package*.json ./
+# Set noninteractive mode for apt-get and update package sources
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
-RUN npm install && npm cache clean --force
+# Update Debian sources and install necessary packages
+RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
+    sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list && \
+    sed -i '/stretch-updates/d' /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get -y dist-upgrade && \
+    apt-get install -y --no-install-recommends musl-dev && \
+    ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy the rest of the application files
+# Copy the application source code
 COPY . .
 
-# Expose the port
-EXPOSE 4000
+# Install dependencies using yarn
+RUN npm install -g pm2 && \
+    rm -rf /usr/share/doc /usr/share/man /tmp/*
+
+# Configure SSH for GitHub access
+RUN mkdir -p ~/.ssh && \
+    ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
 # Start the application
 CMD ["node", "index.js"]

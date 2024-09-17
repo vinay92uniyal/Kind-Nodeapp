@@ -12,8 +12,8 @@ jobs:
     
      - name: Build Docker image for app
        run: |
-          docker build -t my-test:latest -f /home/mnagaraju/actions-runner/Testproject-inno/horizon-dockerfile /home/mnagaraju/actions-runner/Testproject-inno
+          docker build -t my-app:latest -f /home/mnagaraju/actions-runner/Testproject-inno/zephus-dockerfile /home/mnagaraju/actions-runner/Testproject-inno
 
      - name: Build Docker image for node
        run: |
-          docker build -t my-image:latest -f /home/mnagaraju/actions-runner/Testproject-inno/horizon-dockerfile-optimize /home/mnagaraju/actions-runner/Testproject-inno/
+          docker build -t my-node:latest -f /home/mnagaraju/actions-runner/Testproject-inno/zephus-dockerfile-optimize /home/mnagaraju/actions-runner/Testproject-inno/

@@ -16,4 +16,4 @@ jobs:
 
      - name: Build Docker image for node
        run: |
-          docker build -t my-node:latest -f /home/mnagaraju/actions-runner/Testproject-inno/zephus-dockerfile-optimize /home/mnagaraju/actions-runner/Testproject-inno/
+          docker build -t my-node:latest -f /home/mnagaraju/actions-runner/Testproject-inno/zephus-dokerfile-optimize /home/mnagaraju/actions-runner/Testproject-inno/
